@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Admin Workspace</p>
+                <h1>User Management Portal</h1>
+            </div>
+            <div class="topbar-actions">
+                <nav class="nav-tabs" aria-label="Primary navigation">
+                    <button class="nav-link active" data-section-target="home-section">Home</button>
+                    <button class="nav-link" data-section-target="users-section">Users</button>
+                    <button class="nav-link" data-section-target="form-section">Create User</button>
+                </nav>
+                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle color theme">
+                    <span class="theme-toggle-track">
+                        <span class="theme-toggle-thumb"></span>
+                    </span>
+                    <span id="theme-label">Dark mode</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="dashboard-layout">
+            <aside class="hero-panel">
+                <div class="hero-card">
+                    <p class="hero-kicker">Operations snapshot</p>
+                    <h2>Manage users, monitor traffic, and keep CRUD workflows visible.</h2>
+                    <p class="hero-copy">
+                        This static dashboard consumes the configured REST API with a reusable fetch layer,
+                        fast client-side filtering, and guarded destructive actions.
+                    </p>
+                    <div class="hero-metrics">
+                        <article>
+                            <span>API Base URL</span>
+                            <strong id="api-base-url"></strong>
+                        </article>
+                        <article>
+                            <span>Last Sync</span>
+                            <strong id="last-sync-time">Never</strong>
+                        </article>
+                    </div>
+                    <div class="hero-actions">
+                        <button id="hero-refresh" class="primary-button" type="button">Refresh Data</button>
+                        <button id="hero-create" class="ghost-button" type="button">Create User</button>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="content-grid">
+                <section id="home-section" class="panel section-panel active" aria-labelledby="home-heading">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-tag">Dashboard</p>
+                            <h2 id="home-heading">Team overview</h2>
+                        </div>
+                    </div>
+
+                    <div class="summary-grid">
+                        <article class="summary-card accent-blue">
+                            <span>Total Users</span>
+                            <strong id="total-users-count">0</strong>
+                            <p>Live count pulled from the users endpoint.</p>
+                        </article>
+                        <article class="summary-card accent-green">
+                            <span>Active Users</span>
+                            <strong id="active-users-count">0</strong>
+                            <p>Derived client-side for demo purposes.</p>
+                        </article>
+                        <article class="summary-card accent-slate">
+                            <span>Visible Results</span>
+                            <strong id="visible-users-count">0</strong>
+                            <p>Reflects search, sort, and pagination state.</p>
+                        </article>
+                    </div>
+
+                    <div class="insight-grid">
+                        <article class="mini-panel">
+                            <h3>Quick actions</h3>
+                            <button class="link-action" type="button" data-shortcut="users">Review user list</button>
+                            <button class="link-action" type="button" data-shortcut="create">Add a new user</button>
+                        </article>
+                        <article class="mini-panel diagnostics-panel">
+                            <div class="diagnostics-header">
+                                <div>
+                                    <h3>API diagnostics</h3>
+                                    <p>Latest API response or error details for demo visibility.</p>
+                                </div>
+                                <button id="clear-error-log" class="inline-button" type="button">Clear</button>
+                            </div>
+                            <pre id="error-log" class="error-log">No API errors logged.</pre>
+                        </article>
+                    </div>
+                </section>
+
+                <section id="users-section" class="panel section-panel" aria-labelledby="users-heading">
+                    <div class="section-heading stacked-mobile">
+                        <div>
+                            <p class="section-tag">Directory</p>
+                            <h2 id="users-heading">Users list</h2>
+                        </div>
+                        <div class="toolbar-actions">
+                            <button id="refresh-users" class="ghost-button" type="button">Refresh</button>
+                        </div>
+                    </div>
+
+                    <div class="toolbar">
+                        <label class="search-field" for="search-users">
+                            <span>Search</span>
+                            <input id="search-users" type="search" placeholder="Search by name, email, or role" />
+                        </label>
+                        <label class="select-field" for="sort-users">
+                            <span>Sort By</span>
+                            <select id="sort-users">
+                                <option value="name-asc">Name A-Z</option>
+                                <option value="name-desc">Name Z-A</option>
+                                <option value="email-asc">Email A-Z</option>
+                                <option value="email-desc">Email Z-A</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div id="table-loading" class="loading-state hidden" aria-live="polite">
+                        <span class="spinner"></span>
+                        <span>Loading users...</span>
+                    </div>
+
+                    <div class="table-shell">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody">
+                                <tr>
+                                    <td colspan="5" class="empty-state-cell">No users loaded yet.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="pagination-bar">
+                        <p id="pagination-summary">Showing 0 users</p>
+                        <div class="pagination-controls">
+                            <button id="prev-page" class="inline-button" type="button">Previous</button>
+                            <span id="page-indicator">Page 1</span>
+                            <button id="next-page" class="inline-button" type="button">Next</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="form-section" class="panel section-panel" aria-labelledby="form-heading">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-tag">CRUD</p>
+                            <h2 id="form-heading">Create or edit user</h2>
+                        </div>
+                    </div>
+
+                    <form id="user-form" class="user-form">
+                        <input id="user-id" type="hidden" />
+
+                        <div class="field-grid">
+                            <label>
+                                <span>Name</span>
+                                <input id="name" name="name" type="text" required maxlength="120"
+                                    placeholder="Enter full name" />
+                            </label>
+
+                            <label>
+                                <span>Email</span>
+                                <input id="email" name="email" type="email" required maxlength="160"
+                                    placeholder="Enter email address" />
+                            </label>
+
+                            <label>
+                                <span>Password</span>
+                                <input id="password" name="password" type="password" minlength="4"
+                                    placeholder="Enter password" />
+                                <small>Required for create. For edit, leave blank to keep the current value if the API
+                                    supports it.</small>
+                            </label>
+
+                            <label>
+                                <span>Role</span>
+                                <select id="role" name="role" required>
+                                    <option value="">Select role</option>
+                                    <option value="Admin">Admin</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="User">User</option>
+                                    <option value="Viewer">Viewer</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <div class="form-status-row">
+                            <p id="form-mode-label">Mode: Create user</p>
+                            <p id="form-message" class="form-message" aria-live="polite"></p>
+                        </div>
+
+                        <div class="form-actions">
+                            <button id="submit-user" class="primary-button" type="submit">Create User</button>
+                            <button id="reset-form" class="ghost-button" type="button">Reset</button>
+                        </div>
+                    </form>
+                </section>
+            </section>
+        </main>
+    </div>
+
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <div id="confirm-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+        <div class="modal-card">
+            <h2 id="confirm-title">Delete user?</h2>
+            <p id="confirm-copy">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="cancel-delete" class="ghost-button" type="button">Cancel</button>
+                <button id="confirm-delete" class="danger-button" type="button">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
