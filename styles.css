@@ -47,6 +47,32 @@ body.dark-mode {
     --shadow-sm: 0 12px 24px rgba(0, 0, 0, 0.18);
 }
 
+body.forest-mode {
+    color-scheme: light;
+    --bg: #f0faf4;
+    --bg-accent: radial-gradient(circle at top left, rgba(5, 150, 105, 0.20), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.15), transparent 30%),
+        linear-gradient(180deg, #f7fdf9 0%, #f0faf4 100%);
+    --surface: rgba(255, 255, 255, 0.86);
+    --surface-strong: #ffffff;
+    --surface-muted: #e4f5ec;
+    --border: rgba(6, 95, 70, 0.18);
+    --text: #022c22;
+    --text-soft: #4b7c66;
+    --primary: #059669;
+    --primary-strong: #047857;
+    --success: #10b981;
+    --danger: #dc2626;
+    --warning: #d97706;
+    --shadow-lg: 0 28px 80px rgba(5, 46, 22, 0.12);
+    --shadow-md: 0 18px 40px rgba(5, 46, 22, 0.10);
+    --shadow-sm: 0 12px 24px rgba(5, 46, 22, 0.07);
+}
+
+body.forest-mode .brand-logo {
+    box-shadow: 0 8px 20px rgba(5, 150, 105, 0.28);
+}
+
 * {
     box-sizing: border-box;
 }
@@ -90,12 +116,44 @@ button {
     align-items: center;
     justify-content: space-between;
     gap: 18px;
-    padding: 24px 28px;
+    padding: 20px 28px;
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     background: var(--surface);
     box-shadow: var(--shadow-md);
     backdrop-filter: blur(20px);
+    position: relative;
+    overflow: clip;
+}
+
+.topbar::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 8%;
+    right: 8%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--primary), transparent);
+    border-radius: 999px;
+    opacity: 0.6;
+}
+
+.topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand-logo {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(36, 87, 255, 0.28);
 }
 
 .topbar h1,
@@ -140,7 +198,7 @@ button {
 .primary-button,
 .ghost-button,
 .danger-button,
-.theme-toggle,
+.theme-btn,
 .link-action {
     transition: transform var(--transition), background var(--transition), color var(--transition),
         border-color var(--transition), box-shadow var(--transition), opacity var(--transition);
@@ -161,38 +219,30 @@ button {
     box-shadow: var(--shadow-sm);
 }
 
-.theme-toggle {
+.theme-switcher {
     display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px;
-    border-radius: 999px;
+    gap: 4px;
+    padding: 5px;
     background: var(--surface-muted);
-    color: var(--text);
     border: 1px solid var(--border);
-}
-
-.theme-toggle-track {
-    position: relative;
-    width: 44px;
-    height: 24px;
     border-radius: 999px;
-    background: rgba(36, 87, 255, 0.16);
 }
 
-.theme-toggle-thumb {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--primary);
-    transition: transform var(--transition), background var(--transition);
+.theme-btn {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-soft);
+    font-weight: 700;
+    font-size: 0.82rem;
+    white-space: nowrap;
 }
 
-body.dark-mode .theme-toggle-thumb {
-    transform: translateX(20px);
+.theme-btn.active,
+.theme-btn:hover {
+    background: var(--surface-strong);
+    color: var(--text);
+    box-shadow: var(--shadow-sm);
 }
 
 .dashboard-layout {
@@ -686,13 +736,16 @@ button:disabled {
         grid-template-columns: 1fr;
     }
 
-    .nav-tabs {
+    .nav-tabs,
+    .theme-switcher {
         width: 100%;
         justify-content: space-between;
     }
 
-    .nav-link {
+    .nav-link,
+    .theme-btn {
         flex: 1 1 0;
+        text-align: center;
     }
 }
 

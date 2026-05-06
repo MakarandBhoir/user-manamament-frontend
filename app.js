@@ -46,8 +46,7 @@
         submitUser: document.getElementById("submit-user"),
         tableLoading: document.getElementById("table-loading"),
         tbody: document.getElementById("users-tbody"),
-        themeLabel: document.getElementById("theme-label"),
-        themeToggle: document.getElementById("theme-toggle"),
+        themeButtons: Array.from(document.querySelectorAll(".theme-btn")),
         toastContainer: document.getElementById("toast-container"),
         totalUsersCount: document.getElementById("total-users-count"),
         userId: document.getElementById("user-id"),
@@ -86,7 +85,9 @@
         elements.cancelDelete.addEventListener("click", closeDeleteModal);
         elements.confirmDelete.addEventListener("click", handleDeleteConfirmed);
         elements.clearErrorLog.addEventListener("click", clearErrorLog);
-        elements.themeToggle.addEventListener("click", toggleTheme);
+        elements.themeButtons.forEach((btn) => {
+            btn.addEventListener("click", () => setTheme(btn.dataset.theme));
+        });
 
         elements.confirmModal.addEventListener("click", (event) => {
             if (event.target === elements.confirmModal) {
@@ -370,8 +371,9 @@
 
     function setBusy(isBusy) {
         state.busy = isBusy;
+        const excludedIds = ["search-users", "sort-users"];
         document.querySelectorAll("button, input, select").forEach((element) => {
-            if (element.id === "search-users" || element.id === "sort-users") {
+            if (excludedIds.includes(element.id) || element.classList.contains("theme-btn")) {
                 return;
             }
             element.disabled = isBusy;
@@ -439,14 +441,21 @@
         });
     }
 
-    function toggleTheme() {
-        state.theme = state.theme === "dark" ? "light" : "dark";
-        applyTheme(state.theme);
+    function setTheme(theme) {
+        state.theme = theme;
+        applyTheme(theme);
     }
 
     function applyTheme(theme) {
-        document.body.classList.toggle("dark-mode", theme === "dark");
-        elements.themeLabel.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+        document.body.classList.remove("dark-mode", "forest-mode");
+        if (theme === "dark") {
+            document.body.classList.add("dark-mode");
+        } else if (theme === "forest") {
+            document.body.classList.add("forest-mode");
+        }
+        elements.themeButtons.forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.theme === theme);
+        });
         localStorage.setItem("ump-theme", theme);
     }
 
